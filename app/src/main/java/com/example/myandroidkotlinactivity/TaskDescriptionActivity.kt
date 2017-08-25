@@ -1,8 +1,11 @@
 package com.example.myandroidkotlinactivity
 
+import android.app.Activity
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import kotlinx.android.synthetic.main.activity_task_description.*
 
 class TaskDescriptionActivity : AppCompatActivity() {
 
@@ -19,6 +22,20 @@ class TaskDescriptionActivity : AppCompatActivity() {
 
     // 3
     fun doneClicked(view: View) {
+        // 1
+        val taskDescription = descriptionText.text.toString()
 
+        if (!taskDescription.isEmpty()) {
+            // 2
+            val result = Intent()
+            result.putExtra(EXTRA_TASK_DESCRIPTION, taskDescription)
+            setResult(Activity.RESULT_OK, result)
+        } else {
+            // 3
+            setResult(Activity.RESULT_CANCELED)
+        }
+
+        // 4
+        finish()
     }
 }
