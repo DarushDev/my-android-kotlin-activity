@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -40,8 +41,9 @@ class MainActivity : AppCompatActivity() {
 
         taskListView.adapter = adapter
 
-        taskListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id -> }
-
+        taskListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            taskSelected(position)
+        }
         val savedList = getSharedPreferences(PREFS_TASKS, Context.MODE_PRIVATE).getString(KEY_TASKS_LIST, null)
         if (savedList != null) {
             val items = savedList.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -114,6 +116,26 @@ class MainActivity : AppCompatActivity() {
 
         getSharedPreferences(PREFS_TASKS, Context.MODE_PRIVATE).edit()
                 .putString(KEY_TASKS_LIST, savedList.toString()).apply()
+    }
+
+    private fun taskSelected(position: Int) {
+        // 1
+        AlertDialog.Builder(this)
+                // 2
+                .setTitle(R.string.alert_title)
+                // 3
+                .setMessage(taskList[position])
+                .setPositiveButton(R.string.delete, { _, _ ->
+                    taskList.removeAt(position)
+                    adapter.notifyDataSetChanged()
+                })
+                .setNegativeButton(R.string.cancel, { dialog, _ ->
+                    dialog.cancel()
+                })
+                // 4
+                .create()
+                // 5
+                .show()
     }
 
 }
