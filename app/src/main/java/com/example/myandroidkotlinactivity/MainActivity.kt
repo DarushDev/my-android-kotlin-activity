@@ -17,6 +17,8 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    private val PREFS_TASKS = "prefs_tasks"
+    private val KEY_TASKS_LIST = "tasks_list"
     private val ADD_TASK_REQUEST = 1
     private val taskList: MutableList<String> = mutableListOf()
     private val adapter by lazy { makeAdapter(taskList) }
@@ -39,6 +41,12 @@ class MainActivity : AppCompatActivity() {
         taskListView.adapter = adapter
 
         taskListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id -> }
+
+        val savedList = getSharedPreferences(PREFS_TASKS, Context.MODE_PRIVATE).getString(KEY_TASKS_LIST, null)
+        if (savedList != null) {
+            val items = savedList.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            taskList.addAll(items)
+        }
     }
 
     override fun onResume() {
@@ -93,4 +101,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onStop() {
+        super.onStop()
+
+        // Save all data which you want to persist.
+        val savedList = StringBuilder()
+        for (task in taskList) {
+            savedList.append(task)
+            savedList.append(",")
+        }
+
+        getSharedPreferences(PREFS_TASKS, Context.MODE_PRIVATE).edit()
+                .putString(KEY_TASKS_LIST, savedList.toString()).apply()
+    }
+
 }
